@@ -1,0 +1,26 @@
+kind: pipeline
+type: docker
+name: default
+
+steps:
+- name: make
+  image: debian:bullseye
+  commands:
+  - apt-get update
+  - apt-get install -y build-essential libfontconfig-dev libxcb-cursor-dev libx11-dev libxft-dev
+  - make
+- name: notify
+  image: plugins/matrix
+  when:
+    status:
+    - success
+    - failure
+  settings:
+    homeserver:
+      from_secret: matrix-homeserver
+    roomid:
+      from_secret: matrix-room-id
+    userid:
+      from_secret: matrix-user-id
+    accesstoken:
+      from_secret: matrix-access-token
